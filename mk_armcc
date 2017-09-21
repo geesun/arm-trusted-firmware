@@ -1,0 +1,3 @@
+CROSS_COMPILE=/home/geesun/workspace/arm/64-fvp/tools/gcc/gcc-linaro-6.2.1-2016.11-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-  \
+              make CC=/usr/local/DS-5_v5.27.1/sw/ARMCompiler6.7/bin/armclang PLAT=fvp  DEBUG=1  all 
+              make BL33=../64-fvp/output/fvp/components/fvp/uboot.bin PLAT=fvp  DEBUG=1 fip 

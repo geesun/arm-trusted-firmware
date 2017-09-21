@@ -1,0 +1,4 @@
+CROSS_COMPILE=/home/geesun/workspace/toolchains/aarch32/bin/arm-linux-gnueabihf- \
+              make V=1 PLAT=fvp ARCH=aarch32 AARCH32_SP=sp_min \
+			  BL33=/home/geesun/workspace/arm/32-fvp/u-boot/output/vexpress_aemv8a_aarch32/u-boot.bin bl1 fip LOG_LEVEL=50 DEBUG=1
+

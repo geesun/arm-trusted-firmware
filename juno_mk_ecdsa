@@ -1,0 +1,5 @@
+			  CROSS_COMPILE=/home/geesun/workspace/arm/juno/tools/gcc/gcc-linaro-6.2.1-2016.11-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-  \
+              make V=1 BL33=../juno/output/juno/components/juno/uboot.bin SCP_BL2=../juno/recovery/SOFTWARE/scp_bl2.bin PLAT=juno DEBUG=1  TRUSTED_BOARD_BOOT=1 ARM_ROTPK_LOCATION=devel_ecdsa \
+              KEY_ALG=ecdsa TF_MBEDTLS_KEY_ALG=ecdsa ROT_KEY=plat/arm/board/common/rotpk/arm_rotprivk_ecdsa.pem  MBEDTLS_DIR=./mbedtls GENERATE_COT=1\
+              all fip  SPD=tspd 
+

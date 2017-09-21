@@ -1,0 +1,4 @@
+CROSS_COMPILE=/home/geesun/workspace/toolchains/aarch32/bin/arm-linux-gnueabihf- \
+              make PLAT=fvp ARCH=aarch32 AARCH32_SP=optee \
+			  all
+

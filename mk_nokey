@@ -1,0 +1,4 @@
+CROSS_COMPILE=/home/geesun/workspace/arm/64-fvp/tools/gcc/gcc-linaro-6.2.1-2016.11-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-  \
+              make V=1 BL33=../64-fvp/output/fvp/components/fvp/uboot.bin PLAT=fvp DEBUG=1  TRUSTED_BOARD_BOOT=0  \
+              all fip  SPD=tspd 
+

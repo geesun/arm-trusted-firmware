@@ -1,0 +1,5 @@
+CROSS_COMPILE=/home/geesun/workspace/arm/juno/tools/gcc/gcc-linaro-6.2.1-2016.11-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-  \
+              make -j 1 BL33=../juno/output/juno/components/juno/uboot.bin SCP_BL2=../juno/recovery/SOFTWARE/scp_bl2.bin PLAT=juno  DEBUG=1  \
+              all V=1 SPIN_ON_BL1_EXIT=1 EL3_PAYLOAD_BASE=0x80000000 fip
+
+
