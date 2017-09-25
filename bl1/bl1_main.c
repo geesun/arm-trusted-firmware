@@ -71,6 +71,29 @@ void bl1_init_bl2_mem_layout(const meminfo_t *bl1_mem_layout,
 	flush_dcache_range((unsigned long)bl2_mem_layout, sizeof(meminfo_t));
 }
 
+#define MHZ_TICKS_PER_SEC 1000000
+u_register_t calc_stat_residency(unsigned long long pwrupts,
+	unsigned long long pwrdnts)
+{
+	/* The divisor to use to convert raw timestamp into microseconds. */
+	u_register_t residency_div;
+	u_register_t res;
+
+	/*
+	 * Calculate divisor so that it can be directly used to
+	 * convert time-stamp into microseconds.
+	 */
+	residency_div = 0x02FAF080/ MHZ_TICKS_PER_SEC;
+	assert(residency_div);
+
+	if (pwrupts < pwrdnts)
+		res = UINT64_MAX - pwrdnts + pwrupts;
+	else
+		res = pwrupts - pwrdnts;
+
+	return res / residency_div;
+}
+
 /*******************************************************************************
  * Function to perform late architectural and platform specific initialization.
  * It also queries the platform to load and run next BL image. Only called
@@ -137,10 +160,17 @@ void bl1_main(void)
 	 * We currently interpret any image id other than
 	 * BL2_IMAGE_ID as the start of firmware update.
 	 */
+	extern uint64_t get_cntpct();
+	uint64_t a = get_cntpct();
+	NOTICE("time = %lx\n",get_cntpct());
 	if (image_id == BL2_IMAGE_ID)
 		bl1_load_bl2();
 	else
 		NOTICE("BL1-FWU: *******FWU Process Started*******\n");
+	NOTICE("time = %lx \n",get_cntpct());
+	uint64_t b = get_cntpct();
+	
+	NOTICE("load time = %lxms \n",calc_stat_residency(b,a));
 
 	bl1_prepare_next_image(image_id);
 

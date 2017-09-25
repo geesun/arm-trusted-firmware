@@ -15,6 +15,7 @@
 	.globl	dcsw_op_level1
 	.globl	dcsw_op_level2
 	.globl	dcsw_op_level3
+	.globl  get_cntpct
 
 /*
  * This macro can be used for implementing various data cache operations `op`
@@ -201,3 +202,8 @@ endfunc dcsw_op_level2
 func dcsw_op_level3
 	dcsw_op_level #(3 << LEVEL_SHIFT)
 endfunc dcsw_op_level3
+
+func get_cntpct
+	mrs  x0,cntpct_el0
+	ret
+endfunc get_cntpct
