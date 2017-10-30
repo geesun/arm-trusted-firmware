@@ -15,6 +15,7 @@ DESIGN_COMPANY  := designreview
 DESIGN_PLAT     := h960
 DESIGN_ROOT		:= plat/$(DESIGN_COMPANY)/$(DESIGN_PLAT)
 PLAT_INCLUDES	:=	-Iinclude/common/tbbr			\
+				-I$(DESIGN_ROOT)/          \
 				-I$(DESIGN_ROOT)/include
 
 ENABLE_PLAT_COMPAT	:=	0
@@ -38,6 +39,7 @@ BL1_SOURCES		+=	bl1/tbbr/tbbr_img_desc.c		\
 				lib/cpus/aarch64/cortex_a53.S		\
 				$(DESIGN_ROOT)/h960_bl1_setup.c     \
 				$(DESIGN_ROOT)/h960_io_storage.c    \
+				$(DESIGN_ROOT)/h960_common.c    \
 				$(DESIGN_ROOT)/aarch64/h960_helper.S
 
 

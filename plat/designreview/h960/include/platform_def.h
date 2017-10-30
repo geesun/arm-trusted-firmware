@@ -14,6 +14,33 @@
 /* Size of cacheable stacks */
 #define PLATFORM_STACK_SIZE		0x800
 
+/*
+ * PL011 related constants
+ */
+#define PL011_UART5_BASE		0xFDF05000
+#define PL011_UART6_BASE		0xFFF32000
+#define PL011_BAUDRATE			115200
+#define PL011_UART_CLK_IN_HZ		19200000
+
+
+
+#define DDR_BASE			0x0
+#define DDR_SIZE			0xC0000000
+
+#define DEVICE_BASE			0xE0000000
+#define DEVICE_SIZE			0x20000000
+
+
+#define UFS_BASE			0
+/* FIP partition */
+#define H960_FIP_BASE		(UFS_BASE + 0x1400000)
+#define H960_FIP_MAX_SIZE		(12 << 20)
+
+#define H960_UFS_DESC_BASE		0x20000000
+#define H960_UFS_DESC_SIZE		0x00200000	/* 2MB */
+#define H960_UFS_DATA_BASE		0x10000000
+#define H960_UFS_DATA_SIZE		0x0A000000	/* 160MB */
+
 /* 
  * Core relate information 
  */
