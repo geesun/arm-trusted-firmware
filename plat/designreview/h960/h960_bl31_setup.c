@@ -10,6 +10,7 @@
 #include <gicv2.h>
 #include <platform_def.h>
 #include <h960_common.h>
+#include <hi3660.h>
 
 /*
  * The next 2 constants identify the extents of the code & RO data region.
@@ -32,6 +33,24 @@
 
 static entry_point_info_t bl32_ep_info;
 static entry_point_info_t bl33_ep_info;
+
+/******************************************************************************
+ * On a GICv2 system, the Group 1 secure interrupts are treated as Group 0
+ * interrupts.
+ *****************************************************************************/
+const unsigned int g0_interrupt_array[] = {
+	IRQ_SEC_PHY_TIMER,
+	IRQ_SEC_SGI_0
+};
+
+const gicv2_driver_data_t hikey960_gic_data = {
+	.gicd_base = GICD_REG_BASE,
+	.gicc_base = GICC_REG_BASE,
+	.g0_interrupt_num = ARRAY_SIZE(g0_interrupt_array),
+	.g0_interrupt_array = g0_interrupt_array,
+};
+
+
 
 entry_point_info_t *bl31_plat_get_next_image_ep_info(uint32_t type)
 {
@@ -98,7 +117,11 @@ void bl31_plat_arch_setup(void)
 
 void bl31_platform_setup(void)
 {
-
+	/* Initialize the GIC driver, cpu and distributor interfaces */
+	gicv2_driver_init(&hikey960_gic_data);
+	gicv2_distif_init();
+	gicv2_pcpu_distif_init();
+	gicv2_cpuif_enable();
 }
 
 void bl31_plat_runtime_setup(void)
