@@ -30,10 +30,25 @@
 #define DEVICE_BASE			0xE0000000
 #define DEVICE_SIZE			0x20000000
 
+/*
+ * DDR for OP-TEE (32MB from 0x3E00000-0x3FFFFFFF) is divided in several
+ * regions:
+ *   - Secure DDR (default is the top 16MB) used by OP-TEE
+ *   - Non-secure DDR used by OP-TEE (shared memory and padding) (4MB)
+ *   - Secure DDR (4MB aligned on 4MB) for OP-TEE's "Secure Data Path" feature
+ *   - Non-secure DDR (8MB) reserved for OP-TEE's future use
+ */
+#define DDR_SEC_SIZE			0x01000000
+#define DDR_SEC_BASE			0x3F000000
+
+#define DDR_SDP_SIZE			0x00400000
+#define DDR_SDP_BASE			(DDR_SEC_BASE - 0x400000 /* align */ - \
+								DDR_SDP_SIZE)
+
 
 #define UFS_BASE			0
 /* FIP partition */
-#define H960_FIP_BASE		 0x1AC98000
+#define H960_FIP_BASE		 	0x1AC98000
 #define H960_FIP_MAX_SIZE		(12 << 20)
 
 #define H960_UFS_DESC_BASE		0x20000000
@@ -51,6 +66,8 @@
 #define PLAT_MAX_PWR_LVL 				    MPIDR_AFFLVL2
 #define PLAT_NUM_PWR_DOMAINS                (PLATFORM_CORE_COUNT + \
 					 						  PLATFORM_CLUSTER_COUNT + 1)
+#define PLAT_MAX_RET_STATE		1
+#define PLAT_MAX_OFF_STATE		2
 
 /* 
  * IO relate define 
@@ -86,6 +103,23 @@
 #define BL31_LIMIT			(BL31_BASE + 0x40000)	/* 1AC9_8000 */
 
 
+/*
+ * The TSP currently executes from TZC secured area of DRAM.
+ */
+#define BL32_DRAM_BASE                  DDR_SEC_BASE
+#define BL32_DRAM_LIMIT                 (DDR_SEC_BASE+DDR_SEC_SIZE)
+
+#define TSP_SEC_MEM_BASE		BL32_DRAM_BASE
+#define TSP_SEC_MEM_SIZE		(BL32_DRAM_LIMIT - BL32_DRAM_BASE)
+//#define BL32_BASE			BL32_DRAM_BASE
+//#define BL32_LIMIT			BL32_DRAM_LIMIT
+
+#define NS_BL1U_BASE			(BL31_LIMIT)		/* 1AC9_8000 */
+#define NS_BL1U_SIZE			(0x00100000)
+#define NS_BL1U_LIMIT			(NS_BL1U_BASE + NS_BL1U_SIZE)
+
+#define SCP_BL2_BASE			(0x89C80000)
+#define SCP_BL2_SIZE			(0x00040000)
 
 /*
  * Platform specific page table and MMU setup constants
