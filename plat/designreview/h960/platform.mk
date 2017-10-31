@@ -35,7 +35,7 @@ BL1_SOURCES		+=	bl1/tbbr/tbbr_img_desc.c		\
 				drivers/io/io_fip.c			\
 				drivers/io/io_storage.c			\
 				drivers/synopsys/ufs/dw_ufs.c		\
-				drivers/ufs/ufs.c 			\
+				drivers/io/io_memmap.c \
 				lib/cpus/aarch64/cortex_a53.S		\
 				$(DESIGN_ROOT)/h960_bl1_setup.c     \
 				$(DESIGN_ROOT)/h960_io_storage.c    \

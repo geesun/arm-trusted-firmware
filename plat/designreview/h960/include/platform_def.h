@@ -33,7 +33,7 @@
 
 #define UFS_BASE			0
 /* FIP partition */
-#define H960_FIP_BASE		(UFS_BASE + 0x1400000)
+#define H960_FIP_BASE		 0x1AC98000
 #define H960_FIP_MAX_SIZE		(12 << 20)
 
 #define H960_UFS_DESC_BASE		0x20000000

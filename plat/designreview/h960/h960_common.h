@@ -19,4 +19,6 @@ void h960_init_mmu_el3(unsigned long total_base,
 			unsigned long ro_limit,
 			unsigned long coh_start,
 			unsigned long coh_limit);
+
+void hi960_io_setup(void);
 #endif

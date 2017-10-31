@@ -37,6 +37,23 @@ extern unsigned long __COHERENT_RAM_END__;
 /* Data structure which holds the extents of the trusted RAM for BL1 */
 static meminfo_t bl1_tzram_layout;
 
+void bl1_init_bl2_mem_layout(const meminfo_t *bl1_mem_layout,
+			     meminfo_t *bl2_mem_layout)
+{
+
+	assert(bl1_mem_layout != NULL);
+	assert(bl2_mem_layout != NULL);
+
+	/*
+	 * Cannot remove BL1 RW data from the scope of memory visible to BL2
+	 * like arm platforms because they overlap in hikey960
+	 */
+	bl2_mem_layout->total_base = BL2_BASE;
+	bl2_mem_layout->total_size = BL31_LIMIT - BL2_BASE;
+
+	flush_dcache_range((unsigned long)bl2_mem_layout, sizeof(meminfo_t));
+}
+
 void bl1_early_platform_setup(void)
 {
 	unsigned int uart_base;
@@ -62,7 +79,7 @@ void bl1_plat_arch_setup(void)
 }
 void bl1_platform_setup(void)
 {
-
+	hi960_io_setup();
 }
 meminfo_t *bl1_plat_sec_mem_layout(void)
 {
