@@ -33,9 +33,11 @@ H960_GIC_SOURCES	:=	drivers/arm/gic/common/gic_common.c	\
 BL1_SOURCES		+=	bl1/tbbr/tbbr_img_desc.c		\
 				drivers/io/io_fip.c			\
 				drivers/io/io_storage.c			\
+				drivers/io/io_block.c				\
 				drivers/synopsys/ufs/dw_ufs.c		\
 				drivers/io/io_memmap.c \
 				lib/cpus/aarch64/cortex_a53.S		\
+				drivers/ufs/ufs.c 			\
 				$(DESIGN_ROOT)/h960_bl1_setup.c     \
 				$(DESIGN_ROOT)/h960_io_storage.c    \
 				$(DESIGN_ROOT)/h960_common.c    \
@@ -44,8 +46,10 @@ BL1_SOURCES		+=	bl1/tbbr/tbbr_img_desc.c		\
 BL2_SOURCES		+=	\
 				drivers/io/io_fip.c					\
 				drivers/io/io_storage.c				\
+				drivers/io/io_block.c				\
 				common/desc_image_load.c        	\
 				drivers/io/io_memmap.c \
+				drivers/ufs/ufs.c 			\
 				$(DESIGN_ROOT)/h960_bl2_setup.c 	\
 				$(DESIGN_ROOT)/h960_common.c    \
 				$(DESIGN_ROOT)/h960_io_storage.c    \
@@ -65,11 +69,8 @@ BL31_SOURCES		+=	drivers/arm/cci/cci.c			\
 				$(DESIGN_ROOT)/h960_pm.c \
 				${H960_GIC_SOURCES}
 
-		#		plat/hisilicon/hikey960/hikey960_pm.c	\
-				plat/hisilicon/hikey960/hikey960_topology.c \
-				plat/hisilicon/hikey960/drivers/pwrc/hisi_pwrc.c \
+#				plat/hisilicon/hikey960/drivers/pwrc/hisi_pwrc.c \
 				plat/hisilicon/hikey960/drivers/ipc/hisi_ipc.c \
-				${H960_GIC_SOURCES}
 
 # Enable workarounds for selected Cortex-A53 errata.
 ERRATA_A53_836870		:=	1

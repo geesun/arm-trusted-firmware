@@ -10,10 +10,12 @@
 #include <generic_delay_timer.h>
 #include <gicv2.h>
 #include <mmio.h>
+#include <hi3660.h>
 #include <platform.h>
 #include <platform_def.h>
 #include <string.h>
 #include <tbbr/tbbr_img_desc.h>
+#include <ufs.h>
 
 #include <platform_def.h>
 #include <h960_common.h>
@@ -68,6 +70,87 @@ void bl1_early_platform_setup(void)
 	bl1_tzram_layout.total_size = BL1_RW_SIZE;
 }
 
+static void hikey960_peri_init(void)
+{
+	/* unreset */
+	mmio_setbits_32(CRG_PERRSTDIS4_REG, 1);
+}
+
+static void hikey960_ufs_reset(void)
+{
+	unsigned int data, mask;
+
+	mmio_write_32(CRG_PERDIS7_REG, 1 << 14);
+	mmio_clrbits_32(UFS_SYS_PHY_CLK_CTRL_REG, BIT_SYSCTRL_REF_CLOCK_EN);
+	do {
+		data = mmio_read_32(UFS_SYS_PHY_CLK_CTRL_REG);
+	} while (data & BIT_SYSCTRL_REF_CLOCK_EN);
+	/* use abb clk */
+	mmio_clrbits_32(UFS_SYS_UFS_SYSCTRL_REG, BIT_UFS_REFCLK_SRC_SE1);
+	mmio_clrbits_32(UFS_SYS_PHY_ISO_EN_REG, BIT_UFS_REFCLK_ISO_EN);
+	mmio_write_32(PCTRL_PERI_CTRL3_REG, (1 << 0) | (1 << 16));
+	mdelay(1);
+	mmio_write_32(CRG_PEREN7_REG, 1 << 14);
+	mmio_setbits_32(UFS_SYS_PHY_CLK_CTRL_REG, BIT_SYSCTRL_REF_CLOCK_EN);
+
+	mmio_write_32(CRG_PERRSTEN3_REG, PERI_UFS_BIT);
+	do {
+		data = mmio_read_32(CRG_PERRSTSTAT3_REG);
+	} while ((data & PERI_UFS_BIT) == 0);
+	mmio_setbits_32(UFS_SYS_PSW_POWER_CTRL_REG, BIT_UFS_PSW_MTCMOS_EN);
+	mdelay(1);
+	mmio_setbits_32(UFS_SYS_HC_LP_CTRL_REG, BIT_SYSCTRL_PWR_READY);
+	mmio_write_32(UFS_SYS_UFS_DEVICE_RESET_CTRL_REG,
+		      MASK_UFS_DEVICE_RESET);
+	/* clear SC_DIV_UFS_PERIBUS */
+	mask = SC_DIV_UFS_PERIBUS << 16;
+	mmio_write_32(CRG_CLKDIV17_REG, mask);
+	/* set SC_DIV_UFSPHY_CFG(3) */
+	mask = SC_DIV_UFSPHY_CFG_MASK << 16;
+	data = SC_DIV_UFSPHY_CFG(3);
+	mmio_write_32(CRG_CLKDIV16_REG, mask | data);
+	data = mmio_read_32(UFS_SYS_PHY_CLK_CTRL_REG);
+	data &= ~MASK_SYSCTRL_CFG_CLOCK_FREQ;
+	data |= 0x39;
+	mmio_write_32(UFS_SYS_PHY_CLK_CTRL_REG, data);
+	mmio_clrbits_32(UFS_SYS_PHY_CLK_CTRL_REG, MASK_SYSCTRL_REF_CLOCK_SEL);
+	mmio_setbits_32(UFS_SYS_CLOCK_GATE_BYPASS_REG,
+			MASK_UFS_CLK_GATE_BYPASS);
+	mmio_setbits_32(UFS_SYS_UFS_SYSCTRL_REG, MASK_UFS_SYSCTRL_BYPASS);
+
+	mmio_setbits_32(UFS_SYS_PSW_CLK_CTRL_REG, BIT_SYSCTRL_PSW_CLK_EN);
+	mmio_clrbits_32(UFS_SYS_PSW_POWER_CTRL_REG, BIT_UFS_PSW_ISO_CTRL);
+	mmio_clrbits_32(UFS_SYS_PHY_ISO_EN_REG, BIT_UFS_PHY_ISO_CTRL);
+	mmio_clrbits_32(UFS_SYS_HC_LP_CTRL_REG, BIT_SYSCTRL_LP_ISOL_EN);
+	mmio_write_32(CRG_PERRSTDIS3_REG, PERI_ARST_UFS_BIT);
+	mmio_setbits_32(UFS_SYS_RESET_CTRL_EN_REG, BIT_SYSCTRL_LP_RESET_N);
+	mdelay(1);
+	mmio_write_32(UFS_SYS_UFS_DEVICE_RESET_CTRL_REG,
+		      MASK_UFS_DEVICE_RESET | BIT_UFS_DEVICE_RESET);
+	mdelay(20);
+	mmio_write_32(UFS_SYS_UFS_DEVICE_RESET_CTRL_REG,
+		      0x03300330);
+
+	mmio_write_32(CRG_PERRSTDIS3_REG, PERI_UFS_BIT);
+	do {
+		data = mmio_read_32(CRG_PERRSTSTAT3_REG);
+	} while (data & PERI_UFS_BIT);
+}
+
+static void hikey960_ufs_init(void)
+{
+	dw_ufs_params_t ufs_params;
+
+	memset(&ufs_params, 0, sizeof(ufs_params));
+	ufs_params.reg_base = UFS_REG_BASE;
+	ufs_params.desc_base = H960_UFS_DESC_BASE;
+	ufs_params.desc_size = H960_UFS_DESC_SIZE;
+
+	if ((ufs_params.flags & UFS_FLAGS_SKIPINIT) == 0)
+		hikey960_ufs_reset();
+	dw_ufs_init(&ufs_params);
+}
+
 void bl1_plat_arch_setup(void)
 {
 	h960_init_mmu_el3(bl1_tzram_layout.total_base,
@@ -79,6 +162,8 @@ void bl1_plat_arch_setup(void)
 }
 void bl1_platform_setup(void)
 {
+	hikey960_peri_init();
+	hikey960_ufs_init();
 	hi960_io_setup();
 }
 meminfo_t *bl1_plat_sec_mem_layout(void)
