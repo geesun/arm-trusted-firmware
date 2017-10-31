@@ -50,6 +50,7 @@ BL2_SOURCES		+=	\
 				$(DESIGN_ROOT)/h960_common.c    \
 				$(DESIGN_ROOT)/h960_io_storage.c    \
 				$(DESIGN_ROOT)/h960_bl2_mem_params_desc.c    \
+				$(DESIGN_ROOT)/h960_mcu_load.c    \
 
 
 BL31_SOURCES		+=	drivers/arm/cci/cci.c			\

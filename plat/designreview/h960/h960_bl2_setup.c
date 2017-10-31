@@ -10,6 +10,8 @@
 #include <platform_def.h>
 #include <string.h>
 #include <h960_common.h>
+
+extern  int load_lpm3(void);
 /*
  * The next 2 constants identify the extents of the code & RO data region.
  * These addresses are used by the MMU setup code and therefore they must be
@@ -77,6 +79,42 @@ uint32_t hikey960_get_spsr_for_bl33_entry(void)
 	return spsr;
 }
 
+int plat_h960_bl2_handle_scp_bl2(image_info_t *scp_bl2_image_info)
+{
+	int i;
+	int *buf;
+
+	assert(scp_bl2_image_info->image_size < SCP_BL2_SIZE);
+
+	INFO("BL2: Initiating SCP_BL2 transfer to SCP\n");
+
+	INFO("BL2: SCP_BL2: 0x%lx@0x%x\n",
+	     scp_bl2_image_info->image_base,
+	     scp_bl2_image_info->image_size);
+
+	buf = (int *)scp_bl2_image_info->image_base;
+
+	INFO("BL2: SCP_BL2 HEAD:\n");
+	for (i = 0; i < 64; i += 4)
+		INFO("BL2: SCP_BL2 0x%x 0x%x 0x%x 0x%x\n",
+			buf[i], buf[i+1], buf[i+2], buf[i+3]);
+
+	buf = (int *)(scp_bl2_image_info->image_base +
+		      scp_bl2_image_info->image_size - 256);
+
+	INFO("BL2: SCP_BL2 TAIL:\n");
+	for (i = 0; i < 64; i += 4)
+		INFO("BL2: SCP_BL2 0x%x 0x%x 0x%x 0x%x\n",
+			buf[i], buf[i+1], buf[i+2], buf[i+3]);
+
+	INFO("BL2: SCP_BL2 transferred to SCP\n");
+
+	load_lpm3();
+	(void)buf;
+
+	return 0;
+}
+
 int bl2_plat_handle_post_image_load(unsigned int image_id)
 {
 	int err = 0;
@@ -89,6 +127,15 @@ int bl2_plat_handle_post_image_load(unsigned int image_id)
 		bl_mem_params->ep_info.args.arg0 = 0xffff & read_mpidr();
 		bl_mem_params->ep_info.spsr = hikey960_get_spsr_for_bl33_entry();
 		break;
+#ifdef SCP_BL2_BASE
+	case SCP_BL2_IMAGE_ID:
+		/* The subsequent handling of SCP_BL2 is platform specific */
+		err = plat_h960_bl2_handle_scp_bl2(&bl_mem_params->image_info);
+		if (err) {
+			WARN("Failure in platform-specific handling of SCP_BL2 image.\n");
+		}
+		break;
+#endif
 	}
 
 	return err;
