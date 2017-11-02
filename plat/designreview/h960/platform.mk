@@ -67,6 +67,8 @@ BL31_SOURCES		+=	drivers/arm/cci/cci.c			\
 				$(DESIGN_ROOT)/h960_bl31_setup.c \
 				$(DESIGN_ROOT)/h960_topology.c \
 				$(DESIGN_ROOT)/h960_pm.c \
+				$(DESIGN_ROOT)/drivers/pwrc/hisi_pwrc.c \
+				$(DESIGN_ROOT)/drivers/ipc/hisi_ipc.c \
 				${H960_GIC_SOURCES}
 
 #				plat/hisilicon/hikey960/drivers/pwrc/hisi_pwrc.c \

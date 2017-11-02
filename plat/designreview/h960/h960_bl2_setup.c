@@ -55,11 +55,12 @@ void bl2_plat_arch_setup(void)
 			      BL2_RO_LIMIT,
 			      BL2_COHERENT_RAM_BASE,
 			      BL2_COHERENT_RAM_LIMIT);
+	/* Required before loading scp_bl2 */
+	hi960_io_setup();
 }
 
 void bl2_platform_setup(void)
 {
-
 }
 
 uint32_t hikey960_get_spsr_for_bl33_entry(void)
@@ -140,7 +141,6 @@ int bl2_plat_handle_post_image_load(unsigned int image_id)
 
 	return err;
 }
-
 /*******************************************************************************
  * This function flushes the data structures so that they are visible
  * in memory for the next BL image.
@@ -155,8 +155,6 @@ void plat_flush_next_bl_params(void)
  ******************************************************************************/
 bl_load_info_t *plat_get_bl_image_load_info(void)
 {
-	/* Required before loading scp_bl2 */
-	hi960_io_setup();
 
 	return get_bl_load_info_from_mem_params_desc();
 }

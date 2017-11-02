@@ -50,6 +50,10 @@ const gicv2_driver_data_t hikey960_gic_data = {
 	.g0_interrupt_array = g0_interrupt_array,
 };
 
+static const int cci_map[] = {
+	CCI400_SL_IFACE3_CLUSTER_IX,
+	CCI400_SL_IFACE4_CLUSTER_IX
+};
 
 
 entry_point_info_t *bl31_plat_get_next_image_ep_info(uint32_t type)
@@ -75,6 +79,9 @@ void bl31_early_platform_setup(void *from_bl2,
 	/* Initialize the console to provide early debug support */
 	console_init(uart_base, PL011_UART_CLK_IN_HZ, PL011_BAUDRATE);
 
+	/* Initialize CCI driver */
+	cci_init(CCI400_REG_BASE, cci_map, ARRAY_SIZE(cci_map));
+	cci_enable_snoop_dvm_reqs(MPIDR_AFFLVL1_VAL(read_mpidr_el1()));
 
 	/*
 	 * Check params passed from BL2 should not be NULL,
