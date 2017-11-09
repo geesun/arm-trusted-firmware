@@ -11,9 +11,14 @@
 #include <common_def.h>
 #include <tbbr_img_def.h>
 
+#if defined(IMAGE_BL1)
 /* Size of cacheable stacks */
 #define PLATFORM_STACK_SIZE		0x800
-
+#elif defined(IMAGE_BL2)
+#  define PLATFORM_STACK_SIZE 0x1000
+#else 
+#  define PLATFORM_STACK_SIZE 0x1000
+#endif 
 /*
  * PL011 related constants
  */
@@ -48,7 +53,7 @@
 
 #define UFS_BASE			0
 /* FIP partition */
-#define H960_FIP_BASE		 	0x1AC98000
+#define H960_FIP_BASE		 	0x1ACA8000
 #define H960_FIP_MAX_SIZE		(12 << 20)
 
 #define H960_UFS_FIP_BASE		 	(UFS_BASE + 0x1400000)
@@ -88,22 +93,22 @@
  * BL1 specific defines.
  */
 #define BL1_RO_BASE			(0x1AC00000)
-#define BL1_RO_LIMIT			(BL1_RO_BASE + 0x10000)
-#define BL1_RW_BASE			(BL1_RO_LIMIT)		/* 1AC1_0000 */
+#define BL1_RO_LIMIT			(BL1_RO_BASE + 0x20000)
+#define BL1_RW_BASE			(BL1_RO_LIMIT)		/* 1AC2_0000 */
 #define BL1_RW_SIZE			(0x00188000)
 #define BL1_RW_LIMIT			(0x1B000000)
 
 /*
  * BL2 specific defines.
  */
-#define BL2_BASE			(BL1_RW_BASE + 0x8000)	/* 1AC1_8000 */
-#define BL2_LIMIT			(BL2_BASE + 0x40000)	/* 1AC5_8000 */
+#define BL2_BASE			(BL1_RW_BASE + 0x8000)	/* 1AC2_8000 */
+#define BL2_LIMIT			(BL2_BASE + 0x40000)	/* 1AC6_8000 */
 
 /*
  * BL31 specific defines.
  */
-#define BL31_BASE			(BL2_LIMIT)		/* 1AC5_8000 */
-#define BL31_LIMIT			(BL31_BASE + 0x40000)	/* 1AC9_8000 */
+#define BL31_BASE			(BL2_LIMIT)		/* 1AC6_8000 */
+#define BL31_LIMIT			(BL31_BASE + 0x40000)	/* 1ACA_8000 */
 
 
 /*
@@ -117,7 +122,7 @@
 //#define BL32_BASE			BL32_DRAM_BASE
 //#define BL32_LIMIT			BL32_DRAM_LIMIT
 
-#define NS_BL1U_BASE			(BL31_LIMIT)		/* 1AC9_8000 */
+#define NS_BL1U_BASE			(BL31_LIMIT + 0x10000)		/* 1AC9_8000 */
 #define NS_BL1U_SIZE			(0x00100000)
 #define NS_BL1U_LIMIT			(NS_BL1U_BASE + NS_BL1U_SIZE)
 

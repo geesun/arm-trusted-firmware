@@ -133,4 +133,6 @@ void bl31_platform_setup(void)
 
 void bl31_plat_runtime_setup(void)
 {
+	NOTICE("%s %d \n",__FUNCTION__,__LINE__);
 }
+

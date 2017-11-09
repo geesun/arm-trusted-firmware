@@ -30,18 +30,43 @@ H960_GIC_SOURCES	:=	drivers/arm/gic/common/gic_common.c	\
 				drivers/arm/gic/v2/gicv2_helpers.c	\
 				plat/common/plat_gicv2.c
 
+# Use generic OID definition (tbbr_oid.h)
+USE_TBBR_DEFS           :=  1
+
+
+ifneq (${TRUSTED_BOARD_BOOT},0)
+# Include common TBB sources
+AUTH_SOURCES    :=  drivers/auth/auth_mod.c             \
+	drivers/auth/crypto_mod.c           \
+	drivers/auth/img_parser_mod.c           \
+	drivers/auth/tbbr/tbbr_cot.c            \
+	plat/designreview/h960/h960_trusted_boot.c
+
+    # We expect to locate the *.mk files under the directories specified below
+CRYPTO_LIB_MK := drivers/auth/mbedtls/mbedtls_crypto.mk
+IMG_PARSER_LIB_MK := drivers/auth/mbedtls/mbedtls_x509.mk
+
+$(info Including ${CRYPTO_LIB_MK})
+include ${CRYPTO_LIB_MK}
+
+$(info Including ${IMG_PARSER_LIB_MK})
+include ${IMG_PARSER_LIB_MK}
+
+endif 
+
 BL1_SOURCES		+=	bl1/tbbr/tbbr_img_desc.c		\
-				drivers/io/io_fip.c			\
-				drivers/io/io_storage.c			\
-				drivers/io/io_block.c				\
-				drivers/synopsys/ufs/dw_ufs.c		\
-				drivers/io/io_memmap.c \
-				lib/cpus/aarch64/cortex_a53.S		\
-				drivers/ufs/ufs.c 			\
-				$(DESIGN_ROOT)/h960_bl1_setup.c     \
-				$(DESIGN_ROOT)/h960_io_storage.c    \
-				$(DESIGN_ROOT)/h960_common.c    \
-				$(DESIGN_ROOT)/aarch64/h960_helper.S
+					drivers/io/io_fip.c			\
+					drivers/io/io_storage.c			\
+					drivers/io/io_block.c				\
+					drivers/synopsys/ufs/dw_ufs.c		\
+					drivers/io/io_memmap.c \
+					lib/cpus/aarch64/cortex_a53.S		\
+					drivers/ufs/ufs.c 			\
+					$(AUTH_SOURCES) \
+					$(DESIGN_ROOT)/h960_bl1_setup.c     \
+					$(DESIGN_ROOT)/h960_io_storage.c    \
+					$(DESIGN_ROOT)/h960_common.c    \
+					$(DESIGN_ROOT)/aarch64/h960_helper.S
 
 BL2_SOURCES		+=	\
 				drivers/io/io_fip.c					\
@@ -50,6 +75,7 @@ BL2_SOURCES		+=	\
 				common/desc_image_load.c        	\
 				drivers/io/io_memmap.c \
 				drivers/ufs/ufs.c 			\
+				$(AUTH_SOURCES) \
 				$(DESIGN_ROOT)/h960_bl2_setup.c 	\
 				$(DESIGN_ROOT)/h960_common.c    \
 				$(DESIGN_ROOT)/h960_io_storage.c    \
