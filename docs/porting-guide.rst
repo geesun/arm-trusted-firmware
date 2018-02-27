@@ -32,7 +32,7 @@ effort. Each platform port can override them with its own implementation if the
 default implementation is inadequate.
 
 Platform ports that want to be aligned with standard ARM platforms (for example
-FVP and Juno) may also use `include/plat/arm/common/plat\_arm.h`_ and the
+FVP and Juno) may also use `include/plat/arm/common/plat\_arm.h` and the
 corresponding source files in ``plat/arm/common/``. These provide standard
 implementations for some of the required platform porting functions. However,
 using these functions requires the platform port to implement additional
