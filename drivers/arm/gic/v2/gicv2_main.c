@@ -567,3 +567,12 @@ unsigned int gicv2_set_pmr(unsigned int mask)
 
 	return old_mask;
 }
+unsigned int gicd_igroupr0;
+void gicd_igroupr0_context_save()
+{	
+	gicd_igroupr0 = mmio_read_32(driver_data->gicd_base + GICD_IGROUPR);
+}
+void gicd_igroupr0_context_restore()
+{
+	mmio_write_32(driver_data->gicd_base + GICD_IGROUPR, gicd_igroupr0);
+}

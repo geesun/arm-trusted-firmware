@@ -353,7 +353,8 @@ int psci_features(unsigned int psci_fid)
 	/* Return 0 for all other fid's */
 	return PSCI_E_SUCCESS;
 }
-
+extern void gicd_igroupr0_context_save();
+extern void gicd_igroupr0_context_restore();
 /*******************************************************************************
  * PSCI top level handler for servicing SMCs.
  ******************************************************************************/
@@ -366,6 +367,7 @@ u_register_t psci_smc_handler(uint32_t smc_fid,
 			  void *handle,
 			  u_register_t flags)
 {
+	unsigned int ret = 0;
 	if (is_caller_secure(flags))
 		return SMC_UNK;
 
@@ -382,7 +384,10 @@ u_register_t psci_smc_handler(uint32_t smc_fid,
 
 		switch (smc_fid) {
 		case PSCI_VERSION:
-			return psci_version();
+			gicd_igroupr0_context_save();
+			ret =  psci_version();
+			gicd_igroupr0_context_restore(); 
+			return ret;
 
 		case PSCI_CPU_OFF:
 			return psci_cpu_off();
